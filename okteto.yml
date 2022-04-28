@@ -1,0 +1,76 @@
+name: movies-with-compose
+
+# The build section defines how to build the images of your development environment
+# More info: https://www.okteto.com/docs/reference/manifest/#build
+build:
+
+  # You can use the following env vars to refer to this image in your deploy commands:
+  #  - OKTETO_BUILD_API_REGISTRY: image registry
+  #  - OKTETO_BUILD_API_REPOSITORY: image repo
+  #  - OKTETO_BUILD_API_IMAGE: image name
+  #  - OKTETO_BUILD_API_TAG: image tag
+  api:
+    context: api
+    dockerfile: api/Dockerfile
+
+  # You can use the following env vars to refer to this image in your deploy commands:
+  #  - OKTETO_BUILD_FRONTEND_REGISTRY: image registry
+  #  - OKTETO_BUILD_FRONTEND_REPOSITORY: image repo
+  #  - OKTETO_BUILD_FRONTEND_IMAGE: image name
+  #  - OKTETO_BUILD_FRONTEND_TAG: image tag
+  frontend:
+    context: frontend
+    dockerfile: frontend/Dockerfile
+
+  # You can use the following env vars to refer to this image in your deploy commands:
+  #  - OKTETO_BUILD_INIT_REGISTRY: image registry
+  #  - OKTETO_BUILD_INIT_REPOSITORY: image repo
+  #  - OKTETO_BUILD_INIT_IMAGE: image name
+  #  - OKTETO_BUILD_INIT_TAG: image tag
+  init:
+    context: api
+    dockerfile: api/Dockerfile
+
+  # You can use the following env vars to refer to this image in your deploy commands:
+  #  - OKTETO_BUILD_MOVIES_REGISTRY: image registry
+  #  - OKTETO_BUILD_MOVIES_REPOSITORY: image repo
+  #  - OKTETO_BUILD_MOVIES_IMAGE: image name
+  #  - OKTETO_BUILD_MOVIES_TAG: image tag
+  movies:
+    context: reverse-proxy
+    dockerfile: reverse-proxy/Dockerfile
+
+# The deploy section defines how to deploy your development environment
+# More info: https://www.okteto.com/docs/reference/manifest/#deploy
+deploy:
+  compose:
+    file: docker-compose.yml
+    services:
+      - frontend
+
+# The dependencies section defines other git repositories to be deployed as part of your development environment
+# More info: https://www.okteto.com/docs/reference/manifest/#dependencies
+# dependencies:
+#   - https://github.com/okteto/sample
+
+
+# The dev section defines how to activate a development container
+# More info: https://www.okteto.com/docs/reference/manifest/#dev
+dev:
+  api:
+    command:
+      - yarn
+      - start
+    sync:
+      - api:/usr/src/app
+    environment:
+      - MONGODB_DATABASE=okteto
+      - MONGODB_HOST=mongodb
+      - MONGODB_PASSWORD=mongodb123
+      - MONGODB_USERNAME=okteto
+  frontend:
+    command:
+      - yarn
+      - start
+    sync:
+      - frontend:/src
